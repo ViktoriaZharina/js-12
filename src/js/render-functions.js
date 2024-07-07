@@ -19,13 +19,13 @@ export function displayImages(images, gallery) {
             </a>
         </li>
     `).join('');
-    gallery.innerHTML = markup;
+    gallery.insertAdjacentHTML('beforeend', markup); 
 
     const lightbox = new SimpleLightbox('.gallery a', {
         captionsData: 'alt',
         captionDelay: 250,
     });
-    lightbox.refresh();
+     lightbox.refresh();
 }
 
 export function displayToast(message, type) {

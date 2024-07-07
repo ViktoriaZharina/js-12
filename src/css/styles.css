@@ -173,8 +173,8 @@ section {
   border-radius: 50%;
   background: conic-gradient(#0000 10%, #474bff);
   animation: spinner-zp9dbg 1s infinite linear;
-  position: fixed;
-  left: 50%;
+  display: block;
+  margin: 0 auto;
 }
 
 
@@ -182,4 +182,12 @@ section {
   to {
     transform: rotate(1turn);
   }
+}
+
+.load-button {
+  width: 125px;
+  display: block;
+  margin: 0 auto;
+  cursor: pointer;
+
 }
