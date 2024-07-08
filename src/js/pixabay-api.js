@@ -4,6 +4,7 @@ import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
+// Функція для отримання зображень з API
 export async function fetchImages(searchData, page, perPage) {
     try {
         const searchParams = new URLSearchParams({
