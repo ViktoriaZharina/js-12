@@ -1,89 +1,48 @@
+import { fetchImages } from './js/fetchImages';
+import { displayImages, displayToast } from './js/render-functions';
 
-import { fetchImages } from "./js/pixabay-api.js";
-import { displayImages, displayToast } from "./js/render-functions.js";
-import iziToast from "izitoast";
-const searchForm = document.querySelector("form");
-const gallery = document.querySelector(".gallery");
-const loader = document.querySelector(".spinner")
-export const loadButton = document.querySelector(".load-button")
-export let page = 1;
-export let perPage = 15;
+const searchForm = document.querySelector('.search-form');
+const gallery = document.querySelector('.gallery');
+const loadMoreBtn = document.querySelector('.load-more');
 let searchData = '';
+let page = 1;
+const perPage = 40;
+let totalPages = 0;
 
-
-loadButton.classList.add('is-hidden')
-searchForm.addEventListener("submit", event => {
+searchForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    gallery.innerHTML = "";
-    page = 1;
-    loader.classList.remove('is-hidden');
-    searchData = event.target.elements.search_input.value.trim();
-    if (searchData === "") {
-        loadButton.classList.add('is-hidden')
-        displayToast('All form fields must be filled in', 'warning');
-        loader.classList.add('is-hidden');
+    searchData = event.currentTarget.elements.query.value.trim();
+    if (!searchData) {
+        displayToast('Please enter a search query', 'error');
         return;
     }
-    fetchImages(searchData, page, perPage)
-        .then(images => {
-            if (images.total === 0) {
-                displayToast('Sorry, there are no images matching your search query. Please try again!', 'error');
-                loadButton.classList.add('is-hidden');
-                return;
-            } else if (images.total <= 15) {
-                displayImages(images.hits, gallery);
-            return iziToast.error({
-                position: "topRight",
-                message: "We're sorry, there are no more posts to load",
-                messageColor: 'white',
-                backgroundColor: 'red'
-            });
-
-            }
-            loadButton.classList.remove('is-hidden')
-            displayImages(images.hits, gallery);
-        })
-        .catch(error => {
-            console.error('Error fetching images:', error);
-            displayToast('An error occurred while fetching images. Please try again later.', 'error');
-        })
-        .finally(() => {
-            event.target.reset();
-            loader.classList.add('is-hidden');
-            
-        });
-    
-});
-loadButton.addEventListener("click", async () => {
+    gallery.innerHTML = '';
+    page = 1;
     try {
-        loader.classList.remove('is-hidden');
-        page += 1;
-        const images = await fetchImages(searchData, page, perPage);
-        displayImages(images.hits, gallery);
-        const fullImage = document.querySelector(".full-image")
-        let rect = fullImage.getBoundingClientRect();
-        const totalPages = Math.ceil(images.totalHits / perPage);
-        if (page >= totalPages) {
-            loadButton.classList.add('is-hidden')
-            return iziToast.error({
-                position: "topRight",
-                message: "We're sorry, there are no more posts to load",
-                messageColor: 'white',
-                backgroundColor: 'red'
-            });
-            
-        } else {
-            window.scrollBy({
-            top: rect.height*2,
-            behavior: "smooth",
-});
+        const data = await fetchImages(searchData, page, perPage);
+        totalPages = Math.ceil(data.totalHits / perPage);
+        if (data.hits.length === 0) {
+            displayToast('No images found', 'error');
+            return;
         }
-        
+        displayImages(data.hits, gallery);
+        loadMoreBtn.classList.remove('hidden');
+    } catch (error) {
+        displayToast('Error fetching images', 'error');
     }
-    catch (error) {
-        console.log (error)
+});
+
+loadMoreBtn.addEventListener('click', async () => {
+    page += 1;
+    if (page > totalPages) {
+        displayToast('No more images to load', 'info');
+        loadMoreBtn.classList.add('hidden');
+        return;
     }
-    finally {
-        loader.classList.add('is-hidden');
+    try {
+        const data = await fetchImages(searchData, page, perPage);
+        displayImages(data.hits, gallery);
+    } catch (error) {
+        displayToast('Error fetching images', 'error');
     }
-})
+});

@@ -1,4 +1,5 @@
 import axios from "axios";
+
 export async function fetchImages(searchData, page, perPage) {
     try {
         const searchParams = new URLSearchParams({
@@ -14,6 +15,6 @@ export async function fetchImages(searchData, page, perPage) {
         return response.data;
     } catch (error) {
         console.error('Error fetching images:', error);
-        throw error; 
+        throw error;
     }
 }

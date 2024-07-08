@@ -1,8 +1,8 @@
-
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+
 export function displayImages(images, gallery) {
     const markup = images.map(image => `
         <li class="gallery-item">
@@ -19,13 +19,13 @@ export function displayImages(images, gallery) {
             </a>
         </li>
     `).join('');
-    gallery.insertAdjacentHTML('beforeend', markup); 
+    gallery.insertAdjacentHTML('beforeend', markup);
 
     const lightbox = new SimpleLightbox('.gallery a', {
         captionsData: 'alt',
         captionDelay: 250,
     });
-     lightbox.refresh();
+    lightbox.refresh();
 }
 
 export function displayToast(message, type) {
@@ -33,7 +33,6 @@ export function displayToast(message, type) {
         message,
         messageColor: 'white',
         position: 'topRight',
-        backgroundColor: 'red'
-
+        backgroundColor: type === 'error' ? 'red' : 'green'
     });
 }
