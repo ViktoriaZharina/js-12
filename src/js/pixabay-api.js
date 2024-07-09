@@ -1,10 +1,4 @@
 import axios from "axios";
-import iziToast from "izitoast";
-import "izitoast/dist/css/iziToast.min.css";
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
-
-// Функція для отримання зображень з API
 export async function fetchImages(searchData, page, perPage) {
     try {
         const searchParams = new URLSearchParams({
@@ -20,6 +14,10 @@ export async function fetchImages(searchData, page, perPage) {
         return response.data;
     } catch (error) {
         console.error('Error fetching images:', error);
-        throw error;
+        throw error; 
     }
 }
+
+
+            
+    

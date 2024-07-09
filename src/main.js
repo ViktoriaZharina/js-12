@@ -1,6 +1,9 @@
 import { fetchImages } from "./js/pixabay-api.js";
 import { displayImages, displayToast } from "./js/render-functions.js";
 import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.querySelector("form");
@@ -10,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let page = 1;
     const perPage = 15;
     let searchData = '';
+
+    if (!searchForm || !gallery || !loader || !loadButton) {
+        console.error('Required elements are not found in the DOM.');
+        return;
+    }
 
     loadButton.classList.add('is-hidden');
     
