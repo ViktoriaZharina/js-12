@@ -13,7 +13,12 @@
   </head>
   <body>
     <section>
-      <form class="form" name="search_form" autocomplete="off">
+      <form
+        class="form"
+        name="search_form"
+        id="search-form'"
+        autocomplete="off"
+      >
         <input type="text" name="search_input" placeholder="Search images..." />
         <button type="submit">Search</button>
       </form>
@@ -21,6 +26,6 @@
       <div class="spinner is-hidden"></div>
     </section>
 
-    <script type="module" src="./main.js"></script>
+    <script type="module" src="./main.js" defer></script>
   </body>
 </html>
