@@ -1,56 +1,86 @@
-const searchForm = document.getElementById('search-form');
-const gallery = document.querySelector('.gallery');
-const loadMoreBtn = document.querySelector('.load-more');
+import { fetchImages } from "./js/pixabay-api.js";
+import { displayImages, displayToast } from "./js/render-functions.js";
+import iziToast from "izitoast";
 
-let searchData = '';
-let page = 1;
-const perPage = 20;
-let totalPages = 0;
+document.addEventListener('DOMContentLoaded', () => {
+    const searchForm = document.querySelector("form");
+    const gallery = document.querySelector(".gallery");
+    const loader = document.querySelector(".spinner");
+    const loadButton = document.querySelector(".load-button");
+    let page = 1;
+    const perPage = 15;
+    let searchData = '';
 
-searchForm.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    gallery.innerHTML = '';
-    searchData = event.currentTarget.elements.query.value.trim();
-    page = 1;
-
-    if (searchData === '') {
-        displayToast('Please enter a search query', 'error');
-        return;
-    }
-
-    try {
-        const data = await fetchImages(searchData, page, perPage);
-        totalPages = Math.ceil(data.totalHits / perPage);
-
-        if (data.hits.length === 0) {
-            displayToast('No images found. Please try a different search query.', 'error');
-        } else {
-            displayImages(data.hits, gallery);
-            displayToast(`Hooray! We found ${data.totalHits} images.`, 'success');
-            loadMoreBtn.style.display = 'block';
+    loadButton.classList.add('is-hidden');
+    
+    searchForm.addEventListener("submit", event => {
+        event.preventDefault();
+        gallery.innerHTML = "";
+        page = 1;
+        loader.classList.remove('is-hidden');
+        searchData = event.target.elements.search_input.value.trim();
+        if (searchData === "") {
+            loadButton.classList.add('is-hidden');
+            displayToast('All form fields must be filled in', 'warning');
+            loader.classList.add('is-hidden');
+            return;
         }
-    } catch (error) {
-        displayToast('Failed to fetch images. Please try again later.', 'error');
-    }
-});
+        fetchImages(searchData, page, perPage)
+            .then(images => {
+                if (images.total === 0) {
+                    displayToast('Sorry, there are no images matching your search query. Please try again!', 'error');
+                    loadButton.classList.add('is-hidden');
+                    return;
+                } else if (images.total <= 15) {
+                    displayImages(images.hits, gallery);
+                    iziToast.error({
+                        position: "topRight",
+                        message: "We're sorry, there are no more posts to load",
+                        messageColor: 'white',
+                        backgroundColor: 'red'
+                    });
+                } else {
+                    loadButton.classList.remove('is-hidden');
+                    displayImages(images.hits, gallery);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching images:', error);
+                displayToast('An error occurred while fetching images. Please try again later.', 'error');
+            })
+            .finally(() => {
+                event.target.reset();
+                loader.classList.add('is-hidden');
+            });
+    });
 
-loadMoreBtn.addEventListener('click', async () => {
-    if (page > totalPages) {
-        displayToast('No more images to load.', 'error');
-        return;
-    }
-
-    page += 1;
-
-    try {
-        const data = await fetchImages(searchData, page, perPage);
-        displayImages(data.hits, gallery);
-
-        if (page > totalPages) {
-            loadMoreBtn.style.display = 'none';
-            displayToast('No more images to load.', 'error');
+    loadButton.addEventListener("click", async () => {
+        try {
+            loader.classList.remove('is-hidden');
+            page += 1;
+            const images = await fetchImages(searchData, page, perPage);
+            displayImages(images.hits, gallery);
+            const fullImage = document.querySelector(".full-image");
+            let rect = fullImage.getBoundingClientRect();
+            const totalPages = Math.ceil(images.totalHits / perPage);
+            if (page >= totalPages) {
+                loadButton.classList.add('is-hidden');
+                iziToast.error({
+                    position: "topRight",
+                    message: "We're sorry, there are no more posts to load",
+                    messageColor: 'white',
+                    backgroundColor: 'red'
+                });
+            } else {
+                window.scrollBy({
+                    top: rect.height * 2,
+                    behavior: "smooth",
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            loader.classList.add('is-hidden');
         }
-    } catch (error) {
-        displayToast('Failed to load more images. Please try again later.', 'error');
-    }
+    });
 });

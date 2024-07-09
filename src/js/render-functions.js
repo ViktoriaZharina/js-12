@@ -1,3 +1,8 @@
+
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 export function displayImages(images, gallery) {
     const markup = images.map(image => `
         <li class="gallery-item">
@@ -14,21 +19,21 @@ export function displayImages(images, gallery) {
             </a>
         </li>
     `).join('');
-    gallery.insertAdjacentHTML('beforeend', markup);
+    gallery.insertAdjacentHTML('beforeend', markup); 
 
     const lightbox = new SimpleLightbox('.gallery a', {
         captionsData: 'alt',
         captionDelay: 250,
     });
-    lightbox.refresh();
+     lightbox.refresh();
 }
 
-// Функція для відображення повідомлень
 export function displayToast(message, type) {
     iziToast[type]({
         message,
         messageColor: 'white',
         position: 'topRight',
-        backgroundColor: type === 'error' ? 'red' : 'green'
+        backgroundColor: 'red'
+
     });
 }
